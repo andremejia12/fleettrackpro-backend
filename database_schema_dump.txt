@@ -1,0 +1,261 @@
+schema | table_name | column_name | data_type | is_nullable | column_default
+-----------------------------------------------------------------------------
+companies | empresa_saas_plan | id_saas_plan | integer | NO | nextval('companies.empresa_saas_plan_id_saas_plan_seq'::regclass)
+companies | empresa_saas_plan | nombre_plan | character varying | NO | null
+companies | empresa_saas_plan | limite_vehiculos | integer | YES | 10
+companies | empresa_saas_plan | precio_mensual | numeric | NO | null
+companies | empresa_suscripcion_estado | id_suscripcion_estado | integer | NO | nextval('companies.empresa_suscripcion_estado_id_suscripcion_estado_seq'::regclass)
+companies | empresa_suscripcion_estado | nombre_estado | character varying | NO | null
+companies | empresa_suscripcion_estado | descripcion | text | YES | null
+companies | empresas | id_empresa | character varying | NO | null
+companies | empresas | ruc_tax_id | character varying | NO | null
+companies | empresas | razon_social | character varying | NO | null
+companies | empresas | nombre_comercial | character varying | YES | null
+companies | empresas | giro_negocio | character varying | YES | null
+companies | empresas | descripcion_corporativa | text | YES | null
+companies | empresas | direccion_fiscal | character varying | NO | null
+companies | empresas | telefono_corporativo | character varying | YES | null
+companies | empresas | email_corporativo | character varying | YES | null
+companies | empresas | sitio_web | character varying | YES | null
+companies | empresas | estado_suscripcion | character varying | YES | 'Prueba'::character varying
+companies | empresas | plan_suscripcion | character varying | YES | 'Enterprise'::character varying
+companies | empresas | moneda_base | character varying | YES | 'PEN'::character varying
+companies | empresas | fecha_registro_saas | timestamp without time zone | YES | CURRENT_TIMESTAMP
+companies | empresas | logo_url | character varying | YES | null
+companies | empresas | pais_operacion | character varying | YES | 'Peru'::character varying
+companies | ubigeo_departamento | id_departamento | character varying | NO | null
+companies | ubigeo_departamento | nombre_departamento | character varying | NO | null
+companies | ubigeo_distrito | id_distrito | character varying | NO | null
+companies | ubigeo_distrito | id_provincia | character varying | NO | null
+companies | ubigeo_distrito | nombre_distrito | character varying | NO | null
+companies | ubigeo_provincia | id_provincia | character varying | NO | null
+companies | ubigeo_provincia | id_departamento | character varying | NO | null
+companies | ubigeo_provincia | nombre_provincia | character varying | NO | null
+costs | costo_comprobante_tipo | id_comprobante_tipo | integer | NO | nextval('costs.costo_comprobante_tipo_id_comprobante_tipo_seq'::regclass)
+costs | costo_comprobante_tipo | codigo_sunat | character varying | YES | null
+costs | costo_comprobante_tipo | nombre_comprobante | character varying | NO | null
+costs | costo_gasto_categoria | id_gasto_categoria | integer | NO | nextval('costs.costo_gasto_categoria_id_gasto_categoria_seq'::regclass)
+costs | costo_gasto_categoria | nombre_categoria | character varying | NO | null
+costs | costo_gasto_categoria | descripcion | text | YES | null
+costs | costo_moneda | id_moneda | integer | NO | nextval('costs.costo_moneda_id_moneda_seq'::regclass)
+costs | costo_moneda | codigo_iso | character varying | NO | null
+costs | costo_moneda | simbolo | character varying | NO | null
+costs | costo_moneda | nombre_divisa | character varying | YES | null
+costs | gastos | id_gasto | integer | NO | nextval('costs.gastos_id_gasto_seq'::regclass)
+costs | gastos | id_vehiculo | integer | YES | null
+costs | gastos | id_viaje | integer | YES | null
+costs | gastos | id_gasto_categoria | integer | YES | null
+costs | gastos | monto | numeric | NO | null
+costs | gastos | id_moneda | integer | YES | null
+costs | gastos | fecha_gasto | timestamp without time zone | YES | null
+costs | gastos | descripcion | character varying | YES | null
+costs | gastos | id_comprobante_tipo | integer | YES | null
+costs | gastos | comprobante_nro | character varying | YES | null
+costs | gastos | kilometraje_registro | integer | YES | null
+costs | gastos | id_empresa | character varying | NO | null
+costs | ingresos_servicios | id_ingreso | integer | NO | nextval('costs.ingresos_servicios_id_ingreso_seq'::regclass)
+costs | ingresos_servicios | id_orden_trabajo | integer | YES | null
+costs | ingresos_servicios | id_vehiculo | integer | NO | null
+costs | ingresos_servicios | monto_cobrado | numeric | NO | null
+costs | ingresos_servicios | costo_mano_obra_asociado | numeric | YES | null
+costs | ingresos_servicios | id_moneda | integer | YES | null
+costs | ingresos_servicios | fecha_pago | timestamp without time zone | YES | null
+costs | ingresos_servicios | id_viaje_estado | integer | YES | null
+costs | ingresos_servicios | id_empresa | character varying | NO | null
+costs | ingresos_servicios | id_viaje | integer | YES | null
+employees | conductor_estado_laboral | id_estado_laboral | integer | NO | nextval('employees.conductor_estado_laboral_id_estado_laboral_seq'::regclass)
+employees | conductor_estado_laboral | nombre_estado | character varying | NO | null
+employees | conductor_estado_laboral | descripcion | text | YES | null
+employees | conductor_licencia_categoria | id_categoria | integer | NO | nextval('employees.conductor_licencia_categoria_id_categoria_seq'::regclass)
+employees | conductor_licencia_categoria | codigo_categoria | character varying | NO | null
+employees | conductor_licencia_categoria | descripcion | text | YES | null
+employees | conductor_tipo_sangre | id_tipo_sangre | integer | NO | nextval('employees.conductor_tipo_sangre_id_tipo_sangre_seq'::regclass)
+employees | conductor_tipo_sangre | grupo_sanguineo | character varying | NO | null
+employees | conductores | id_conductor | integer | NO | nextval('employees.conductores_id_conductor_seq'::regclass)
+employees | conductores | numero_documento | character varying | NO | null
+employees | conductores | nombre | character varying | NO | null
+employees | conductores | apellido | character varying | NO | null
+employees | conductores | licencia_nro | character varying | YES | null
+employees | conductores | telefono | character varying | YES | null
+employees | conductores | email | character varying | YES | null
+employees | conductores | id_estado_laboral | integer | YES | null
+employees | conductores | id_categoria | integer | YES | null
+employees | conductores | licencia_vencimiento | date | YES | null
+employees | conductores | id_tipo_sangre | integer | YES | null
+employees | conductores | contacto_emergencia | character varying | YES | null
+employees | conductores | costo_hora | numeric | YES | null
+employees | conductores | id_empresa | character varying | NO | null
+employees | conductores | puesto | character varying | YES | null
+employees | conductores | id_tipo_documento | integer | NO | null
+fleet | sucursales_garitas | id_sucursal | character varying | NO | null
+fleet | sucursales_garitas | id_empresa | character varying | NO | null
+fleet | sucursales_garitas | nombre_sucursal | character varying | NO | null
+fleet | sucursales_garitas | direccion | character varying | NO | null
+fleet | sucursales_garitas | id_distrito | character varying | YES | null
+fleet | sucursales_garitas | contacto_responsable | character varying | YES | null
+fleet | sucursales_garitas | telefono_contacto | character varying | YES | null
+fleet | sucursales_garitas | es_taller_interno | character varying | YES | 'NO'::character varying
+fleet | vehiculo_color | id_color | integer | NO | nextval('fleet.vehiculo_color_id_color_seq'::regclass)
+fleet | vehiculo_color | nombre_color | character varying | NO | null
+fleet | vehiculo_estado_operativo | id_estado_operativo | integer | NO | nextval('fleet.vehiculo_estado_operativo_id_estado_operativo_seq'::regclass)
+fleet | vehiculo_estado_operativo | nombre_estado | character varying | NO | null
+fleet | vehiculo_estado_operativo | descripcion | text | YES | null
+fleet | vehiculo_marca | id_marca | integer | NO | nextval('fleet.vehiculo_marca_id_marca_seq'::regclass)
+fleet | vehiculo_marca | nombre_marca | character varying | NO | null
+fleet | vehiculo_modelo | id_modelo | integer | NO | nextval('fleet.vehiculo_modelo_id_modelo_seq'::regclass)
+fleet | vehiculo_modelo | id_marca | integer | NO | null
+fleet | vehiculo_modelo | nombre_modelo | character varying | NO | null
+fleet | vehiculo_propiedad_tipo | id_propiedad_tipo | integer | NO | nextval('fleet.vehiculo_propiedad_tipo_id_propiedad_tipo_seq'::regclass)
+fleet | vehiculo_propiedad_tipo | nombre_propiedad | character varying | NO | null
+fleet | vehiculo_tipo_unidad | id_tipo_unidad | integer | NO | nextval('fleet.vehiculo_tipo_unidad_id_tipo_unidad_seq'::regclass)
+fleet | vehiculo_tipo_unidad | nombre_tipo | character varying | NO | null
+fleet | vehiculo_tipo_unidad | descripcion | text | YES | null
+fleet | vehiculos | id_vehiculo | integer | NO | nextval('fleet.vehiculos_id_vehiculo_seq'::regclass)
+fleet | vehiculos | placa | character varying | NO | null
+fleet | vehiculos | id_marca | integer | YES | null
+fleet | vehiculos | id_modelo | integer | YES | null
+fleet | vehiculos | anio | integer | YES | null
+fleet | vehiculos | capacidad_carga | numeric | YES | null
+fleet | vehiculos | id_estado_operativo | integer | YES | 1
+fleet | vehiculos | fecha_registro | timestamp without time zone | YES | null
+fleet | vehiculos | id_tipo_unidad | integer | YES | null
+fleet | vehiculos | id_color | integer | YES | null
+fleet | vehiculos | nro_chasis_vin | character varying | YES | null
+fleet | vehiculos | id_propiedad_tipo | integer | YES | null
+fleet | vehiculos | kilometraje_actual | integer | YES | null
+fleet | vehiculos | soat_vencimiento | date | YES | null
+fleet | vehiculos | revision_tecnica_vencimiento | date | YES | null
+fleet | vehiculos | ultima_latitud | numeric | YES | null
+fleet | vehiculos | ultima_longitud | numeric | YES | null
+fleet | vehiculos | id_empresa | character varying | NO | null
+maintenance | mantenimiento_tipo_servicio | id_tipo_servicio | integer | NO | nextval('maintenance.mantenimiento_tipo_servicio_id_tipo_servicio_seq'::regclass)
+maintenance | mantenimiento_tipo_servicio | nombre_servicio | character varying | NO | null
+maintenance | mantenimiento_tipo_servicio | descripcion | text | YES | null
+maintenance | mantenimientos | id_mantenimiento | integer | NO | nextval('maintenance.mantenimientos_id_mantenimiento_seq'::regclass)
+maintenance | mantenimientos | id_vehiculo | integer | NO | null
+maintenance | mantenimientos | id_tipo_servicio | integer | YES | null
+maintenance | mantenimientos | descripcion_falla | text | YES | null
+maintenance | mantenimientos | costo_reparacion | numeric | YES | null
+maintenance | mantenimientos | fecha_entrada | timestamp without time zone | YES | null
+maintenance | mantenimientos | fecha_salida | timestamp without time zone | YES | null
+maintenance | mantenimientos | taller_nombre | character varying | YES | null
+maintenance | mantenimientos | kilometraje_entrada | integer | YES | null
+maintenance | mantenimientos | orden_servicio_taller | character varying | YES | null
+maintenance | mantenimientos | garantia_meses | integer | YES | null
+maintenance | mantenimientos | id_empresa | character varying | NO | null
+maintenance | mantenimientos | id_taller | integer | YES | null
+maintenance | repuesto_catalogo | id_repuesto | integer | NO | nextval('maintenance.repuesto_catalogo_id_repuesto_seq'::regclass)
+maintenance | repuesto_catalogo | codigo_repuesto | character varying | NO | null
+maintenance | repuesto_catalogo | nombre_repuesto | character varying | NO | null
+maintenance | repuesto_catalogo | costo_referencial | numeric | YES | null
+maintenance | repuestos_mantenimiento_detalle | id_detalle_repuesto | character varying | NO | null
+maintenance | repuestos_mantenimiento_detalle | id_mantenimiento | integer | NO | null
+maintenance | repuestos_mantenimiento_detalle | codigo_repuesto | character varying | NO | null
+maintenance | repuestos_mantenimiento_detalle | nombre_repuesto | character varying | NO | null
+maintenance | repuestos_mantenimiento_detalle | cantidad_utilizada | integer | NO | null
+maintenance | repuestos_mantenimiento_detalle | costo_unitario | numeric | NO | null
+maintenance | repuestos_mantenimiento_detalle | costo_total_repuesto | numeric | NO | null
+maintenance | repuestos_mantenimiento_detalle | mecanico_asignado | character varying | YES | null
+maintenance | taller_catalogo | id_taller | integer | NO | nextval('maintenance.taller_catalogo_id_taller_seq'::regclass)
+maintenance | taller_catalogo | nombre_taller | character varying | NO | null
+maintenance | taller_catalogo | direccion | character varying | YES | null
+maintenance | taller_catalogo | telefono | character varying | YES | null
+maintenance | taller_catalogo | ruc | character varying | YES | null
+operations | checklist_inspeccion_viaje | id_checklist | character varying | NO | null
+operations | checklist_inspeccion_viaje | id_viaje | integer | NO | null
+operations | checklist_inspeccion_viaje | nivel_combustible_proporcion | character varying | YES | null
+operations | checklist_inspeccion_viaje | estado_neumaticos | character varying | YES | null
+operations | checklist_inspeccion_viaje | tiene_herramientas_emergencia | character varying | YES | 'SI'::character varying
+operations | checklist_inspeccion_viaje | luces_operativas | character varying | YES | 'SI'::character varying
+operations | checklist_inspeccion_viaje | observaciones_carroceria | text | YES | null
+operations | checklist_inspeccion_viaje | firma_digital_conductor_url | character varying | YES | null
+operations | checklist_inspeccion_viaje | fecha_inspeccion | timestamp without time zone | YES | CURRENT_TIMESTAMP
+operations | operacion_prioridad | id_prioridad | integer | NO | nextval('operations.operacion_prioridad_id_prioridad_seq'::regclass)
+operations | operacion_prioridad | nombre_prioridad | character varying | NO | null
+operations | operacion_prioridad | color_hex | character varying | YES | null
+operations | operacion_viaje_estado | id_viaje_estado | integer | NO | nextval('operations.operacion_viaje_estado_id_viaje_estado_seq'::regclass)
+operations | operacion_viaje_estado | nombre_estado | character varying | NO | null
+operations | operacion_viaje_estado | descripcion | text | YES | null
+operations | ordenes_trabajo | id_orden_trabajo | integer | NO | nextval('operations.ordenes_trabajo_id_orden_trabajo_seq'::regclass)
+operations | ordenes_trabajo | id_vehiculo | integer | NO | null
+operations | ordenes_trabajo | id_conductor | integer | NO | null
+operations | ordenes_trabajo | tipo_incidencia | character varying | YES | null
+operations | ordenes_trabajo | descripcion | text | YES | null
+operations | ordenes_trabajo | direccion | character varying | YES | null
+operations | ordenes_trabajo | id_prioridad | integer | YES | 1
+operations | ordenes_trabajo | id_viaje_estado | integer | YES | 1
+operations | ordenes_trabajo | fecha_registro | timestamp without time zone | YES | null
+operations | ordenes_trabajo | id_empresa | character varying | NO | null
+operations | viajes | id_viaje | integer | NO | nextval('operations.viajes_id_viaje_seq'::regclass)
+operations | viajes | id_vehiculo | integer | NO | null
+operations | viajes | id_conductor | integer | NO | null
+operations | viajes | id_orden_trabajo | integer | YES | null
+operations | viajes | origen | character varying | YES | null
+operations | viajes | destino | character varying | YES | null
+operations | viajes | fecha_salida | timestamp without time zone | YES | null
+operations | viajes | fecha_llegada | timestamp without time zone | YES | null
+operations | viajes | id_viaje_estado | integer | YES | 1
+operations | viajes | orden_trabajo_nro | character varying | YES | null
+operations | viajes | kilometraje_salida | integer | YES | null
+operations | viajes | kilometraje_llegada | integer | YES | null
+operations | viajes | volumen_atendido_m3 | numeric | YES | null
+operations | viajes | id_empresa | character varying | NO | null
+operations | viajes | fecha_llegada_estimada | timestamp without time zone | YES | null
+saas_admin | administradores_saas | id_admin | integer | NO | nextval('saas_admin.administradores_saas_id_admin_seq'::regclass)
+saas_admin | administradores_saas | nombre | character varying | NO | null
+saas_admin | administradores_saas | email | character varying | NO | null
+saas_admin | administradores_saas | contrasenia | character varying | NO | null
+saas_admin | administradores_saas | id_rol_saas | integer | NO | null
+saas_admin | administradores_saas | estado_cuenta | character varying | YES | 'Activo'::character varying
+saas_admin | administradores_saas | fecha_creacion | timestamp without time zone | YES | CURRENT_TIMESTAMP
+saas_admin | administradores_saas | ultimo_acceso | timestamp without time zone | YES | null
+saas_admin | factura_estado_pago | id_estado_pago | integer | NO | nextval('saas_admin.factura_estado_pago_id_estado_pago_seq'::regclass)
+saas_admin | factura_estado_pago | nombre_estado | character varying | NO | null
+saas_admin | facturas_saas | id_factura | integer | NO | nextval('saas_admin.facturas_saas_id_factura_seq'::regclass)
+saas_admin | facturas_saas | id_empresa | character varying | NO | null
+saas_admin | facturas_saas | numero_factura | character varying | NO | null
+saas_admin | facturas_saas | periodo_facturado | character varying | NO | null
+saas_admin | facturas_saas | monto | numeric | NO | null
+saas_admin | facturas_saas | moneda | character varying | YES | 'PEN'::character varying
+saas_admin | facturas_saas | fecha_emision | date | NO | null
+saas_admin | facturas_saas | fecha_vencimiento | date | YES | null
+saas_admin | facturas_saas | id_estado_pago | integer | NO | 1
+saas_admin | facturas_saas | fecha_pago | date | YES | null
+saas_admin | facturas_saas | id_metodo_pago | integer | YES | null
+saas_admin | facturas_saas | referencia_pago | character varying | YES | null
+saas_admin | gasto_interno_categoria | id_categoria | integer | NO | nextval('saas_admin.gasto_interno_categoria_id_categoria_seq'::regclass)
+saas_admin | gasto_interno_categoria | nombre_categoria | character varying | NO | null
+saas_admin | gastos_internos_saas | id_gasto_interno | integer | NO | nextval('saas_admin.gastos_internos_saas_id_gasto_interno_seq'::regclass)
+saas_admin | gastos_internos_saas | concepto | character varying | NO | null
+saas_admin | gastos_internos_saas | id_categoria | integer | NO | null
+saas_admin | gastos_internos_saas | monto | numeric | NO | null
+saas_admin | gastos_internos_saas | moneda | character varying | YES | 'PEN'::character varying
+saas_admin | gastos_internos_saas | fecha_gasto | date | NO | null
+saas_admin | gastos_internos_saas | comprobante_nro | character varying | YES | null
+saas_admin | gastos_internos_saas | descripcion | text | YES | null
+saas_admin | gastos_internos_saas | fecha_registro | timestamp without time zone | YES | CURRENT_TIMESTAMP
+saas_admin | metodo_pago | id_metodo_pago | integer | NO | nextval('saas_admin.metodo_pago_id_metodo_pago_seq'::regclass)
+saas_admin | metodo_pago | nombre_metodo | character varying | NO | null
+saas_admin | rol_saas | id_rol_saas | integer | NO | nextval('saas_admin.rol_saas_id_rol_saas_seq'::regclass)
+saas_admin | rol_saas | nombre_rol | character varying | NO | null
+saas_admin | rol_saas | descripcion | text | YES | null
+security | rol | id_rol | integer | NO | nextval('security.rol_id_rol_seq'::regclass)
+security | rol | nombre_rol | character varying | NO | null
+security | rol | descripcion | text | YES | null
+security | tipo_documento | id_tipo_documento | integer | NO | nextval('security.tipo_documento_id_tipo_documento_seq'::regclass)
+security | tipo_documento | codigo | character varying | NO | null
+security | tipo_documento | nombre | character varying | NO | null
+security | usuario | id_user | integer | NO | nextval('security.usuario_id_user_seq'::regclass)
+security | usuario | id_rol | integer | NO | null
+security | usuario | contrasenia | character varying | NO | null
+security | usuario | dni | character varying | NO | null
+security | usuario | telefono | character varying | YES | null
+security | usuario | email | character varying | NO | null
+security | usuario | fecha_nacimiento | date | YES | null
+security | usuario | id_usuario_estado | integer | YES | 1
+security | usuario | id_empresa | character varying | NO | null
+security | usuario | nombre | character varying | YES | null
+security | usuario | ultimo_acceso | timestamp without time zone | YES | null
+security | usuario_estado | id_usuario_estado | integer | NO | nextval('security.usuario_estado_id_usuario_estado_seq'::regclass)
+security | usuario_estado | nombre_estado | character varying | NO | null
+security | usuario_estado | descripcion | text | YES | null
