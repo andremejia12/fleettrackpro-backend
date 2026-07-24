@@ -21,4 +21,10 @@ public class VehiculoTipoUnidad extends PanacheEntityBase {
     public String nombreTipo;
 
     public String descripcion;
+
+    @Column(name = "km_parametro_mensual")
+    public Integer kmParametroMensual;
+
+    @Column(name = "horas_parametro_mensual")
+    public Integer horasParametroMensual;
 }

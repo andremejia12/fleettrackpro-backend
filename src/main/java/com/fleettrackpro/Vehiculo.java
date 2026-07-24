@@ -61,4 +61,16 @@ public class Vehiculo extends PanacheEntityBase {
 
     @Column(name = "id_empresa")
     public String idEmpresa;
+
+    @Column(name = "id_sucursal_base")
+    public String idSucursalBase;
+
+    @Column(name = "valor_compra")
+    public Double valorCompra;
+
+    @Column(name = "valor_residual")
+    public Double valorResidual;
+
+    @Column(name = "vida_util_anios")
+    public Integer vidaUtilAnios;
 }

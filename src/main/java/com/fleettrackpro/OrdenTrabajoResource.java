@@ -52,6 +52,7 @@ public class OrdenTrabajoResource {
     @POST
     @Transactional
     public OrdenTrabajo crear(OrdenTrabajo nuevo) {
+        RoleAccess.requireRole(request, "admin", "despachador", "mecanico");
         nuevo.idEmpresa = TenantAccess.company(request);
         validar(nuevo);
         if (nuevo.fechaRegistro == null) nuevo.fechaRegistro = LocalDateTime.now();
@@ -63,6 +64,7 @@ public class OrdenTrabajoResource {
     @Path("/{id}")
     @Transactional
     public void eliminar(@PathParam("id") Integer id) {
+        RoleAccess.requireRole(request, "admin", "despachador", "mecanico");
         OrdenTrabajo orden = OrdenTrabajo.findById(id);
         if (orden == null) {
             throw new NotFoundException("Orden de trabajo no encontrada");
@@ -94,6 +96,7 @@ public class OrdenTrabajoResource {
     @Path("/{id}")
     @Transactional
     public OrdenTrabajo actualizar(@PathParam("id") Integer id, OrdenTrabajo actualizado) {
+        RoleAccess.requireRole(request, "admin", "despachador", "mecanico");
         OrdenTrabajo orden = OrdenTrabajo.findById(id);
         if (orden == null) {
             throw new NotFoundException("Orden de trabajo no encontrada");

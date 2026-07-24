@@ -51,4 +51,7 @@ public class Gasto extends PanacheEntityBase {
 
     @Column(name = "id_metodo_pago", nullable = false)
     public Integer idMetodoPago;
+
+    @Column(name = "cantidad_galones")
+    public Double cantidadGalones;
 }

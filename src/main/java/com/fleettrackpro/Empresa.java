@@ -38,11 +38,11 @@ public class Empresa extends PanacheEntityBase {
     @Column(name = "sitio_web")
     public String sitioWeb;
 
-    @Column(name = "estado_suscripcion")
-    public String estadoSuscripcion;
+    @Column(name = "id_suscripcion_estado")
+    public Integer idSuscripcionEstado;
 
-    @Column(name = "plan_suscripcion")
-    public String planSuscripcion;
+    @Column(name = "id_saas_plan")
+    public Integer idSaasPlan;
 
     @Column(name = "moneda_base")
     public String monedaBase;

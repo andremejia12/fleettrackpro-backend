@@ -10,10 +10,14 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.container.ContainerRequestContext;
 
 @Path("/catalogos")
 @Produces(MediaType.APPLICATION_JSON)
 public class CatalogoResource {
+    @Context
+    ContainerRequestContext request;
 
     @GET
     @Path("/planes-saas")
@@ -183,6 +187,7 @@ public class CatalogoResource {
     @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
     public RepuestoCatalogo crearRepuesto(RepuestoCatalogo nuevo) {
+        RoleAccess.requireRole(request, "admin", "mecanico");
         if (nuevo.codigoRepuesto == null || nuevo.codigoRepuesto.trim().isEmpty() ||
                 nuevo.nombreRepuesto == null || nuevo.nombreRepuesto.trim().isEmpty()) {
             throw new jakarta.ws.rs.WebApplicationException(
@@ -200,6 +205,7 @@ public class CatalogoResource {
     @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
     public TallerCatalogo crearTaller(TallerCatalogo nuevo) {
+        RoleAccess.requireRole(request, "admin", "mecanico");
         if (nuevo.nombreTaller == null || nuevo.nombreTaller.trim().isEmpty()) {
             throw new jakarta.ws.rs.WebApplicationException(
                     jakarta.ws.rs.core.Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)
@@ -237,6 +243,7 @@ public class CatalogoResource {
     @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
     public RepuestoCatalogo actualizarRepuesto(@PathParam("id") Integer id, RepuestoCatalogo actualizado) {
+        RoleAccess.requireRole(request, "admin", "mecanico");
         RepuestoCatalogo repuesto = RepuestoCatalogo.findById(id);
         if (repuesto == null) {
             throw new NotFoundException("Repuesto no encontrado en catálogo");
@@ -270,6 +277,7 @@ public class CatalogoResource {
     @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
     public TallerCatalogo actualizarTaller(@PathParam("id") Integer id, TallerCatalogo actualizado) {
+        RoleAccess.requireRole(request, "admin", "mecanico");
         TallerCatalogo taller = TallerCatalogo.findById(id);
         if (taller == null) {
             throw new NotFoundException("Taller no encontrado en catálogo");

@@ -51,6 +51,16 @@ public class GastoResource {
     }
 
     private void validarViaje(Gasto gasto) {
+        CostoGastoCategoria categoria = gasto.idGastoCategoria == null
+                ? null : CostoGastoCategoria.findById(gasto.idGastoCategoria);
+        boolean esCfp = categoria != null && categoria.tipoCosto != null
+                && "CFP".equalsIgnoreCase(categoria.tipoCosto.trim());
+        if (gasto.idVehiculo == null) {
+            if (esCfp && gasto.idViaje == null) {
+                return;
+            }
+            throw new BadRequestException("Selecciona un vehículo para este tipo de gasto");
+        }
         Vehiculo vehiculo = Vehiculo.findById(gasto.idVehiculo);
         if (vehiculo == null || !TenantAccess.company(request).equals(vehiculo.idEmpresa)) {
             throw new BadRequestException("El vehículo no pertenece a tu empresa");
@@ -90,6 +100,7 @@ public class GastoResource {
     @POST
     @Transactional
     public Gasto crear(Gasto nuevo) {
+        RoleAccess.requireRole(request, "admin", "contador");
         nuevo.idEmpresa = TenantAccess.company(request);
         validarMetodoPago(nuevo);
         validarDatos(nuevo, null);
@@ -102,6 +113,7 @@ public class GastoResource {
     @Path("/{id}")
     @Transactional
     public Gasto actualizar(@PathParam("id") Integer id, Gasto actualizado) {
+        RoleAccess.requireRole(request, "admin", "contador");
         Gasto gasto = Gasto.findById(id);
         if (gasto == null) {
             throw new NotFoundException("Gasto no encontrado");
@@ -124,6 +136,7 @@ public class GastoResource {
         gasto.comprobanteNro = actualizado.comprobanteNro;
         gasto.kilometrajeRegistro = actualizado.kilometrajeRegistro;
         gasto.idMetodoPago = actualizado.idMetodoPago;
+        gasto.cantidadGalones = actualizado.cantidadGalones;
         return gasto;
     }
 

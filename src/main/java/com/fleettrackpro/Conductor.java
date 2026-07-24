@@ -53,4 +53,7 @@ public class Conductor extends PanacheEntityBase {
 
     @Column(name = "id_empresa")
     public String idEmpresa;
+
+    @Column(name = "id_usuario")
+    public Integer idUsuario;
 }

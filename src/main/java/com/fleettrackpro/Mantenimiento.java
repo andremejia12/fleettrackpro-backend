@@ -68,6 +68,12 @@ public class Mantenimiento extends PanacheEntityBase {
     @Column(name = "id_moneda")
     public Integer idMoneda;
 
+    @Column(name = "naturaleza_mantenimiento")
+    public String naturalezaMantenimiento;
+
+    @Column(name = "periodicidad_km")
+    public Integer periodicidadKm;
+
     @OneToMany(mappedBy = "mantenimiento", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     public List<RepuestoMantenimientoDetalle> repuestos = new ArrayList<>();

@@ -61,6 +61,18 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         }
 
         request.setProperty("fleettrack.session", session);
+
+        if (RoleAccess.isConductor(request)
+                && !path.equals("viajes")
+                && !path.startsWith("viajes/")
+                && !path.equals("checklist")
+                && !path.startsWith("checklist/")
+                && !path.equals("sucursales")
+                && !path.equals("catalogos/departamentos")
+                && !path.equals("catalogos/provincias")
+                && !path.equals("catalogos/distritos")) {
+            request.abortWith(forbidden("El rol conductor no tiene acceso a este recurso."));
+        }
     }
 
     private Response forbidden(String message) {

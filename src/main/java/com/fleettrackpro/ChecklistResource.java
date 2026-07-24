@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,6 +17,13 @@ public class ChecklistResource {
         Viaje viaje = Viaje.findById(idViaje);
         if (viaje == null) throw new NotFoundException("Viaje no encontrado");
         TenantAccess.require(request, viaje.idEmpresa);
+        if (RoleAccess.isConductor(request)
+                && !RoleAccess.conductorIdFor(request).equals(viaje.idConductor)) {
+            throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN)
+                    .entity(java.util.Map.of("message", "El viaje no pertenece al conductor autenticado"))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build());
+        }
         return viaje;
     }
 

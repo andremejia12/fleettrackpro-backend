@@ -66,6 +66,7 @@ public class IngresoServicioResource {
     @POST
     @Transactional
     public IngresoServicio crear(IngresoServicio nuevo) {
+        RoleAccess.requireRole(request, "admin", "contador");
         nuevo.idEmpresa = TenantAccess.company(request);
         validarMetodoPago(nuevo);
         validarDatos(nuevo);
@@ -89,6 +90,7 @@ public class IngresoServicioResource {
     @Path("/{id}")
     @Transactional
     public IngresoServicio actualizar(@PathParam("id") Integer id, IngresoServicio actualizado) {
+        RoleAccess.requireRole(request, "admin", "contador");
         IngresoServicio ingreso = IngresoServicio.findById(id);
         if (ingreso == null) {
             throw new NotFoundException("Ingreso no encontrado");

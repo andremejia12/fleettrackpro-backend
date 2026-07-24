@@ -21,4 +21,10 @@ public class CostoGastoCategoria extends PanacheEntityBase {
     public String nombreCategoria;
 
     public String descripcion;
+
+    @Column(name = "es_prorrateable")
+    public Boolean esProrrateable;
+
+    @Column(name = "tipo_costo")
+    public String tipoCosto;
 }

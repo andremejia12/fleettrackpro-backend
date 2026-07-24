@@ -1,0 +1,5 @@
+=== REPORTE DE TABLAS HUERFANAS / SIN RELACION FISICA ===
+Estas tablas no tienen ninguna constraint de FOREIGN KEY de entrada ni de salida en PostgreSQL.
+
+
+Total de tablas huerfanas encontradas: 0

@@ -31,6 +31,9 @@ public class AdminAuthResource {
     }
 
     private boolean passwordCorrecta(String contraseniaPlano, String hashGuardado) {
+        if (contraseniaPlano == null || hashGuardado == null) {
+            return false;
+        }
         String hashNormalizado = hashGuardado.replaceFirst("^\\$2[abxy]\\$", "\\$2a\\$");
         return BcryptUtil.matches(contraseniaPlano, hashNormalizado);
     }
@@ -41,9 +44,12 @@ public class AdminAuthResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response login(LoginRequest req) {
-        AdministradorSaas admin = AdministradorSaas.find("email", req.email).firstResult();
+        String email = req == null || req.email == null ? "" : req.email.trim();
+        AdministradorSaas admin = AdministradorSaas
+                .find("lower(email) = ?1", email.toLowerCase(java.util.Locale.ROOT))
+                .firstResult();
 
-        if (admin == null || !passwordCorrecta(req.contrasenia, admin.contrasenia)) {
+        if (admin == null || !passwordCorrecta(req == null ? null : req.contrasenia, admin.contrasenia)) {
             return Response.status(401)
                     .entity("{\"mensaje\":\"Correo electrónico o contraseña incorrectos.\"}")
                     .build();

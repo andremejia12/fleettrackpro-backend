@@ -10,6 +10,8 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
@@ -19,6 +21,8 @@ import java.util.Map;
 
 @Path("/mi-suscripcion")
 public class SuscripcionResource {
+    @Context
+    ContainerRequestContext request;
 
     public static class PagoRequest {
         public Integer idMetodoPago;
@@ -45,8 +49,9 @@ public class SuscripcionResource {
                 return Response.noContent().build();
             }
             LocalDate proximaFecha = proximaFechaFacturacion(empresa);
-            EmpresaSaasPlan plan = EmpresaSaasPlan.find("lower(nombrePlan) = lower(?1)", empresa.planSuscripcion)
-                    .firstResult();
+            EmpresaSaasPlan plan = empresa.idSaasPlan == null
+                    ? null
+                    : EmpresaSaasPlan.findById(empresa.idSaasPlan);
 
             Map<String, Object> result = new HashMap<>();
             result.put("tienePagoPendiente", false);
@@ -84,6 +89,7 @@ public class SuscripcionResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response pagarAdelantado(@QueryParam("idEmpresa") String idEmpresa, PagoRequest pago) {
+        RoleAccess.requireRole(request, "admin");
         if (idEmpresa == null || idEmpresa.isBlank()) {
             return error(400, "idEmpresa es requerido");
         }
@@ -98,8 +104,9 @@ public class SuscripcionResource {
         if (empresa == null || empresa.fechaRegistroSaas == null) {
             return error(404, "Empresa o fecha de suscripción no encontrada");
         }
-        EmpresaSaasPlan plan = EmpresaSaasPlan.find("lower(nombrePlan) = lower(?1)", empresa.planSuscripcion)
-                .firstResult();
+        EmpresaSaasPlan plan = empresa.idSaasPlan == null
+                ? null
+                : EmpresaSaasPlan.findById(empresa.idSaasPlan);
         if (plan == null) {
             return error(409, "El plan de suscripción no tiene una tarifa configurada");
         }
@@ -158,6 +165,7 @@ public class SuscripcionResource {
             @PathParam("idFactura") Integer idFactura,
             @QueryParam("idEmpresa") String idEmpresa,
             PagoRequest pago) {
+        RoleAccess.requireRole(request, "admin");
         if (idEmpresa == null || idEmpresa.isBlank()) {
             return error(400, "idEmpresa es requerido");
         }

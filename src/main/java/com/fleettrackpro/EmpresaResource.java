@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Path("/empresas")
 public class EmpresaResource {
@@ -17,9 +18,10 @@ public class EmpresaResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Empresa> listar() {
+    public List<EmpresaConCatalogosDTO> listar() {
         TenantAccess.requireAdminSaas(request);
-        return Empresa.listAll();
+        List<Empresa> empresas = Empresa.listAll();
+        return empresas.stream().map(this::conCatalogos).toList();
     }
 
     @GET
@@ -31,7 +33,7 @@ public class EmpresaResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         TenantAccess.require(request, e.idEmpresa);
-        return Response.ok(e).build();
+        return Response.ok(conCatalogos(e)).build();
     }
 
     @PUT
@@ -55,13 +57,14 @@ public class EmpresaResource {
         e.telefonoCorporativo = req.telefonoCorporativo;
         e.emailCorporativo = req.emailCorporativo;
         e.sitioWeb = req.sitioWeb;
-        e.estadoSuscripcion = req.estadoSuscripcion;
-        e.planSuscripcion = req.planSuscripcion;
+        validarCatalogos(req);
+        e.idSuscripcionEstado = req.idSuscripcionEstado;
+        e.idSaasPlan = req.idSaasPlan;
         e.monedaBase = req.monedaBase;
         e.logoUrl = req.logoUrl;
         e.paisOperacion = req.paisOperacion;
 
-        return Response.ok(e).build();
+        return Response.ok(conCatalogos(e)).build();
     }
 
     @Inject
@@ -77,8 +80,8 @@ public class EmpresaResource {
         public String telefonoCorporativo;
         public String emailCorporativo;
         public String sitioWeb;
-        public String estadoSuscripcion;
-        public String planSuscripcion;
+        public Integer idSuscripcionEstado;
+        public Integer idSaasPlan;
         public String monedaBase;
         public String logoUrl;
         public String paisOperacion;
@@ -107,8 +110,9 @@ public class EmpresaResource {
         nueva.telefonoCorporativo = req.telefonoCorporativo;
         nueva.emailCorporativo = req.emailCorporativo;
         nueva.sitioWeb = req.sitioWeb;
-        nueva.estadoSuscripcion = req.estadoSuscripcion;
-        nueva.planSuscripcion = req.planSuscripcion;
+        validarCatalogos(req);
+        nueva.idSuscripcionEstado = req.idSuscripcionEstado;
+        nueva.idSaasPlan = req.idSaasPlan;
         nueva.monedaBase = req.monedaBase;
         nueva.fechaRegistroSaas = LocalDateTime.now();
         nueva.logoUrl = req.logoUrl;
@@ -116,6 +120,33 @@ public class EmpresaResource {
 
         nueva.persist();
 
-        return Response.status(Response.Status.CREATED).entity(nueva).build();
+        return Response.status(Response.Status.CREATED).entity(conCatalogos(nueva)).build();
+    }
+
+    private void validarCatalogos(EmpresaRequest req) {
+        if (req == null || req.idSaasPlan == null || EmpresaSaasPlan.findById(req.idSaasPlan) == null) {
+            throw badRequest("Selecciona un plan de suscripción válido");
+        }
+        if (req.idSuscripcionEstado == null
+                || EmpresaSuscripcionEstado.findById(req.idSuscripcionEstado) == null) {
+            throw badRequest("Selecciona un estado de suscripción válido");
+        }
+    }
+
+    private EmpresaConCatalogosDTO conCatalogos(Empresa empresa) {
+        EmpresaSaasPlan plan = empresa.idSaasPlan == null
+                ? null
+                : EmpresaSaasPlan.findById(empresa.idSaasPlan);
+        EmpresaSuscripcionEstado estado = empresa.idSuscripcionEstado == null
+                ? null
+                : EmpresaSuscripcionEstado.findById(empresa.idSuscripcionEstado);
+        return EmpresaConCatalogosDTO.from(empresa, plan, estado);
+    }
+
+    private WebApplicationException badRequest(String mensaje) {
+        return new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
+                .entity(Map.of("message", mensaje))
+                .type(MediaType.APPLICATION_JSON)
+                .build());
     }
 }

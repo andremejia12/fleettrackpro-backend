@@ -20,5 +20,11 @@ public class MantenimientoTipoServicio extends PanacheEntityBase {
     @Column(name = "nombre_servicio")
     public String nombreServicio;
 
+    @Column(name = "codigo_tipo")
+    public String codigoTipo;
+
+    @Column(name = "sistema_vehiculo")
+    public String sistemaVehiculo;
+
     public String descripcion;
 }

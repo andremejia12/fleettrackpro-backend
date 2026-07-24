@@ -28,6 +28,10 @@ public class Viaje extends PanacheEntityBase {
     public Integer idOrdenTrabajo;
 
     public String origen;
+
+    @Column(name = "id_sucursal_origen")
+    public String idSucursalOrigen;
+
     public String destino;
 
     @Column(name = "fecha_salida")

@@ -12,51 +12,41 @@ import java.util.Locale;
 import java.util.*;
 import java.util.stream.Collectors;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Context;
 
 @Path("/dashboard")
 public class DashboardResource {
+    @Context
+    ContainerRequestContext request;
 
     @GET
     @Path("/summary")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Object> summary(@QueryParam("idEmpresa") String idEmpresa) {
-        boolean sinFiltro = idEmpresa == null || idEmpresa.isBlank();
+        String empresa = TenantAccess.company(request);
         CostoMoneda monedaPen = CostoMoneda.find("upper(codigoIso)", "PEN").firstResult();
         Integer idMonedaPen = monedaPen != null ? monedaPen.idMoneda : null;
 
-        long totalVehicles = sinFiltro ? Vehiculo.count() : Vehiculo.count("idEmpresa", idEmpresa);
-        long activeVehicles = sinFiltro
-                ? Vehiculo.count("idEstadoOperativo = ?1", 1)
-                : Vehiculo.count("idEstadoOperativo = ?1 and idEmpresa = ?2", 1, idEmpresa);
-        long driversOnRoute = sinFiltro
-                ? Conductor.count("idEstadoLaboral = ?1", 2)
-                : Conductor.count("idEstadoLaboral = ?1 and idEmpresa = ?2", 2, idEmpresa);
-        long pendingMaintenance = sinFiltro
-                ? Mantenimiento.count("fechaSalida is null")
-                : Mantenimiento.count("fechaSalida is null and idEmpresa = ?1", idEmpresa);
+        long totalVehicles = Vehiculo.count("idEmpresa", empresa);
+        long activeVehicles = Vehiculo.count("idEstadoOperativo = ?1 and idEmpresa = ?2", 1, empresa);
+        long driversOnRoute = Conductor.count("idEstadoLaboral = ?1 and idEmpresa = ?2", 2, empresa);
+        long pendingMaintenance = Mantenimiento.count("fechaSalida is null and idEmpresa = ?1", empresa);
 
         int currentMonth = java.time.LocalDate.now().getMonthValue();
         int currentYear = java.time.LocalDate.now().getYear();
 
-        List<Gasto> listGastos = sinFiltro
-                ? Gasto.list(
-                        "fechaGasto is not null and extract(month from fechaGasto) = ?1 and extract(year from fechaGasto) = ?2",
-                        currentMonth, currentYear)
-                : Gasto.list(
-                        "fechaGasto is not null and extract(month from fechaGasto) = ?1 and extract(year from fechaGasto) = ?2 and idEmpresa = ?3",
-                        currentMonth, currentYear, idEmpresa);
+        List<Gasto> listGastos = Gasto.list(
+                "fechaGasto is not null and extract(month from fechaGasto) = ?1 and extract(year from fechaGasto) = ?2 and idEmpresa = ?3",
+                currentMonth, currentYear, empresa);
         double monthlyOperatingCost = listGastos.stream()
                 .filter(g -> idMonedaPen != null && idMonedaPen.equals(g.idMoneda))
                 .mapToDouble(g -> g.monto != null ? g.monto.doubleValue() : 0.0)
                 .sum();
 
-        List<Mantenimiento> currentMonthMaintenances = sinFiltro
-                ? Mantenimiento.list(
-                        "fechaEntrada is not null and extract(month from fechaEntrada) = ?1 and extract(year from fechaEntrada) = ?2",
-                        currentMonth, currentYear)
-                : Mantenimiento.list(
-                        "fechaEntrada is not null and extract(month from fechaEntrada) = ?1 and extract(year from fechaEntrada) = ?2 and idEmpresa = ?3",
-                        currentMonth, currentYear, idEmpresa);
+        List<Mantenimiento> currentMonthMaintenances = Mantenimiento.list(
+                "fechaEntrada is not null and extract(month from fechaEntrada) = ?1 and extract(year from fechaEntrada) = ?2 and idEmpresa = ?3",
+                currentMonth, currentYear, empresa);
         double monthlyMaintenanceCost = 0.0;
         for (Mantenimiento m : currentMonthMaintenances) {
             if (idMonedaPen == null || !idMonedaPen.equals(m.idMoneda)) continue;
@@ -90,7 +80,7 @@ public class DashboardResource {
             @QueryParam("idEmpresa") String idEmpresa,
             @QueryParam("idMetodoPago") Integer idMetodoPago,
             @QueryParam("moneda") String monedaSolicitada) {
-        boolean sinFiltro = idEmpresa == null || idEmpresa.isBlank();
+        String empresa = TenantAccess.company(request);
         String moneda = monedaSolicitada == null || monedaSolicitada.isBlank()
                 ? "PEN" : monedaSolicitada.toUpperCase(Locale.ROOT);
         CostoMoneda monedaEntidad = CostoMoneda.find("upper(codigoIso)", moneda).firstResult();
@@ -101,39 +91,27 @@ public class DashboardResource {
         int currentMonth = java.time.LocalDate.now().getMonthValue();
         int currentYear = java.time.LocalDate.now().getYear();
 
-        List<IngresoServicio> listIngresos = sinFiltro
-                ? IngresoServicio.list(
-                        "fechaPago is not null and extract(month from fechaPago) = ?1 and extract(year from fechaPago) = ?2",
-                        currentMonth, currentYear)
-                : IngresoServicio.list(
-                        "fechaPago is not null and extract(month from fechaPago) = ?1 and extract(year from fechaPago) = ?2 and idEmpresa = ?3",
-                        currentMonth, currentYear, idEmpresa);
+        List<IngresoServicio> listIngresos = IngresoServicio.list(
+                "fechaPago is not null and extract(month from fechaPago) = ?1 and extract(year from fechaPago) = ?2 and idEmpresa = ?3",
+                currentMonth, currentYear, empresa);
         double totalIngresos = listIngresos.stream()
                 .filter(i -> idMetodoPago == null || idMetodoPago.equals(i.idMetodoPago))
                 .filter(i -> idMoneda.equals(i.idMoneda))
                 .mapToDouble(i -> i.montoCobrado != null ? i.montoCobrado : 0.0)
                 .sum();
 
-        List<Gasto> listGastos = sinFiltro
-                ? Gasto.list(
-                        "fechaGasto is not null and extract(month from fechaGasto) = ?1 and extract(year from fechaGasto) = ?2",
-                        currentMonth, currentYear)
-                : Gasto.list(
-                        "fechaGasto is not null and extract(month from fechaGasto) = ?1 and extract(year from fechaGasto) = ?2 and idEmpresa = ?3",
-                        currentMonth, currentYear, idEmpresa);
+        List<Gasto> listGastos = Gasto.list(
+                "fechaGasto is not null and extract(month from fechaGasto) = ?1 and extract(year from fechaGasto) = ?2 and idEmpresa = ?3",
+                currentMonth, currentYear, empresa);
         double totalGastos = listGastos.stream()
                 .filter(g -> idMetodoPago == null || idMetodoPago.equals(g.idMetodoPago))
                 .filter(g -> idMoneda.equals(g.idMoneda))
                 .mapToDouble(g -> g.monto != null ? g.monto.doubleValue() : 0.0)
                 .sum();
 
-        List<Mantenimiento> listMantenimientos = sinFiltro
-                ? Mantenimiento.list(
-                        "fechaEntrada is not null and extract(month from fechaEntrada) = ?1 and extract(year from fechaEntrada) = ?2",
-                        currentMonth, currentYear)
-                : Mantenimiento.list(
-                        "fechaEntrada is not null and extract(month from fechaEntrada) = ?1 and extract(year from fechaEntrada) = ?2 and idEmpresa = ?3",
-                        currentMonth, currentYear, idEmpresa);
+        List<Mantenimiento> listMantenimientos = Mantenimiento.list(
+                "fechaEntrada is not null and extract(month from fechaEntrada) = ?1 and extract(year from fechaEntrada) = ?2 and idEmpresa = ?3",
+                currentMonth, currentYear, empresa);
         double totalMantenimientos = 0.0;
         for (Mantenimiento m : listMantenimientos) {
             if (idMetodoPago != null && !idMetodoPago.equals(m.idMetodoPago)) continue;
@@ -150,13 +128,9 @@ public class DashboardResource {
             }
         }
 
-        List<FacturaSaas> listSuscripciones = sinFiltro
-                ? FacturaSaas.list(
-                        "fechaPago is not null and extract(month from fechaPago) = ?1 and extract(year from fechaPago) = ?2",
-                        currentMonth, currentYear)
-                : FacturaSaas.list(
-                        "fechaPago is not null and extract(month from fechaPago) = ?1 and extract(year from fechaPago) = ?2 and idEmpresa = ?3",
-                        currentMonth, currentYear, idEmpresa);
+        List<FacturaSaas> listSuscripciones = FacturaSaas.list(
+                "fechaPago is not null and extract(month from fechaPago) = ?1 and extract(year from fechaPago) = ?2 and idEmpresa = ?3",
+                currentMonth, currentYear, empresa);
         double totalSuscripciones = listSuscripciones.stream()
                 .filter(f -> idMetodoPago == null || idMetodoPago.equals(f.idMetodoPago))
                 .filter(f -> moneda.equalsIgnoreCase(f.moneda))
@@ -181,16 +155,15 @@ public class DashboardResource {
     @Path("/status-breakdown")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Map<String, Object>> statusBreakdown(@QueryParam("idEmpresa") String idEmpresa) {
-        boolean sinFiltro = idEmpresa == null || idEmpresa.isBlank();
+        String empresa = TenantAccess.company(request);
         Map<Integer, String> labels = Map.of(1, "En ruta", 2, "Disponible", 3, "Mantenimiento", 4, "Inactivo");
         Map<Integer, String> colors = Map.of(1, "var(--accent-teal)", 2, "var(--accent-blue)", 3, "var(--accent-amber)",
                 4, "#8b94a7");
 
         List<Map<String, Object>> result = new ArrayList<>();
         for (Integer estadoId : List.of(1, 2, 3, 4)) {
-            long count = sinFiltro
-                    ? Vehiculo.count("idEstadoOperativo = ?1", estadoId)
-                    : Vehiculo.count("idEstadoOperativo = ?1 and idEmpresa = ?2", estadoId, idEmpresa);
+            long count = Vehiculo.count(
+                    "idEstadoOperativo = ?1 and idEmpresa = ?2", estadoId, empresa);
             Map<String, Object> item = new HashMap<>();
             item.put("status", estadoId == 1 ? "en_ruta"
                     : estadoId == 2 ? "disponible" : estadoId == 3 ? "mantenimiento" : "inactivo");
@@ -206,10 +179,9 @@ public class DashboardResource {
     @Path("/maintenance-alerts")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Map<String, Object>> maintenanceAlerts(@QueryParam("idEmpresa") String idEmpresa) {
-        boolean sinFiltro = idEmpresa == null || idEmpresa.isBlank();
-        List<Mantenimiento> enTaller = sinFiltro
-                ? Mantenimiento.list("fechaSalida is null")
-                : Mantenimiento.list("fechaSalida is null and idEmpresa = ?1", idEmpresa);
+        String empresa = TenantAccess.company(request);
+        List<Mantenimiento> enTaller = Mantenimiento.list(
+                "fechaSalida is null and idEmpresa = ?1", empresa);
         return enTaller.stream().map(m -> {
             Vehiculo v = Vehiculo.findById(m.idVehiculo);
             Map<String, Object> item = new HashMap<>();
@@ -227,16 +199,29 @@ public class DashboardResource {
     @Path("/recent-operations")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Map<String, Object>> recentOperations(@QueryParam("idEmpresa") String idEmpresa) {
-        boolean sinFiltro = idEmpresa == null || idEmpresa.isBlank();
-        List<Viaje> viajes = sinFiltro ? Viaje.listAll() : Viaje.list("idEmpresa", idEmpresa);
+        String empresa = TenantAccess.company(request);
+        List<Viaje> viajes = Viaje.list("idEmpresa", empresa);
         return viajes.stream().map(v -> {
             Vehiculo veh = Vehiculo.findById(v.idVehiculo);
             Conductor c = Conductor.findById(v.idConductor);
+            String origen = v.origen;
+            if ((origen == null || origen.isBlank()) && v.idSucursalOrigen != null) {
+                SucursalGarita sucursal = SucursalGarita.findById(v.idSucursalOrigen);
+                if (sucursal != null && empresa.equals(sucursal.idEmpresa)) {
+                    origen = sucursal.nombreSucursal;
+                }
+            }
+            if (origen == null || origen.isBlank()) {
+                origen = "Origen no especificado";
+            }
+            String destino = v.destino == null || v.destino.isBlank()
+                    ? "Destino no especificado" : v.destino;
             Map<String, Object> item = new HashMap<>();
             item.put("id", v.idViaje);
             item.put("plate", veh != null ? veh.placa : "");
             item.put("driver", c != null ? c.nombre + " " + c.apellido : "");
-            item.put("route", v.origen + " - " + v.destino);
+            item.put("route", origen + " - " + destino);
+            item.put("operationDate", v.fechaSalida);
             String status = estadoViaje(v.idViajeEstado);
             item.put("status", status);
             item.put("eta", "completado".equals(status) ? "Llegó"
@@ -250,7 +235,7 @@ public class DashboardResource {
     @Path("/monthly-costs")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Map<String, Object>> monthlyCosts(@QueryParam("idEmpresa") String idEmpresa) {
-        boolean sinFiltro = idEmpresa == null || idEmpresa.isBlank();
+        String empresa = TenantAccess.company(request);
         CostoMoneda monedaPen = CostoMoneda.find("upper(codigoIso)", "PEN").firstResult();
         Integer idMonedaPen = monedaPen != null ? monedaPen.idMoneda : null;
         List<Map<String, Object>> result = new ArrayList<>();
@@ -260,26 +245,21 @@ public class DashboardResource {
             int mesNum = periodo.getMonthValue();
             int anio = periodo.getYear();
 
-            double combustible = (sinFiltro
-                    ? Gasto.<Gasto>find("idGastoCategoria = ?1 and extract(month from fechaGasto) = ?2 and extract(year from fechaGasto) = ?3", 1, mesNum, anio)
-                    : Gasto.<Gasto>find(
+            double combustible = Gasto.<Gasto>find(
                             "idGastoCategoria = ?1 and extract(month from fechaGasto) = ?2 and extract(year from fechaGasto) = ?3 and idEmpresa = ?4", 1,
-                            mesNum, anio, idEmpresa))
+                            mesNum, anio, empresa)
                     .stream().filter(g -> idMonedaPen != null && idMonedaPen.equals(g.idMoneda))
                     .mapToDouble(g -> g.monto != null ? g.monto.doubleValue() : 0).sum();
 
-            double peajes = (sinFiltro
-                    ? Gasto.<Gasto>find("idGastoCategoria = ?1 and extract(month from fechaGasto) = ?2 and extract(year from fechaGasto) = ?3", 2, mesNum, anio)
-                    : Gasto.<Gasto>find(
+            double peajes = Gasto.<Gasto>find(
                             "idGastoCategoria = ?1 and extract(month from fechaGasto) = ?2 and extract(year from fechaGasto) = ?3 and idEmpresa = ?4", 2,
-                            mesNum, anio, idEmpresa))
+                            mesNum, anio, empresa)
                     .stream().filter(g -> idMonedaPen != null && idMonedaPen.equals(g.idMoneda))
                     .mapToDouble(g -> g.monto != null ? g.monto.doubleValue() : 0).sum();
 
-            double mantenimiento = (sinFiltro
-                    ? Mantenimiento.<Mantenimiento>find("extract(month from fechaEntrada) = ?1 and extract(year from fechaEntrada) = ?2", mesNum, anio)
-                    : Mantenimiento.<Mantenimiento>find("extract(month from fechaEntrada) = ?1 and extract(year from fechaEntrada) = ?2 and idEmpresa = ?3",
-                            mesNum, anio, idEmpresa))
+            double mantenimiento = Mantenimiento.<Mantenimiento>find(
+                            "extract(month from fechaEntrada) = ?1 and extract(year from fechaEntrada) = ?2 and idEmpresa = ?3",
+                            mesNum, anio, empresa)
                     .stream().filter(m -> idMonedaPen != null && idMonedaPen.equals(m.idMoneda))
                     .mapToDouble(m -> m.costoReparacion != null ? m.costoReparacion : 0).sum();
 
@@ -309,14 +289,13 @@ public class DashboardResource {
     @Path("/license-alerts")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Map<String, Object>> licenseAlerts(@QueryParam("idEmpresa") String idEmpresa) {
-        boolean sinFiltro = idEmpresa == null || idEmpresa.isBlank();
+        String empresa = TenantAccess.company(request);
         LocalDate hoy = LocalDate.now();
         LocalDate limite = hoy.plusDays(30);
 
-        List<Conductor> porVencer = sinFiltro
-                ? Conductor.list("licenciaVencimiento is not null and licenciaVencimiento <= ?1", limite)
-                : Conductor.list("licenciaVencimiento is not null and licenciaVencimiento <= ?1 and idEmpresa = ?2",
-                        limite, idEmpresa);
+        List<Conductor> porVencer = Conductor.list(
+                "licenciaVencimiento is not null and licenciaVencimiento <= ?1 and idEmpresa = ?2",
+                limite, empresa);
 
         return porVencer.stream().map(c -> {
             long diasRestantes = java.time.temporal.ChronoUnit.DAYS.between(hoy, c.licenciaVencimiento);
