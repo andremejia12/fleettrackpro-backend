@@ -1,12 +1,13 @@
-# Build: 2026-07-20
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+# Etapa 1: Compilar el proyecto con Maven
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY pom.xml ./pom.xml
+COPY pom.xml .
 COPY src ./src
-RUN mvn clean package -DskipTests -q
+RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:21-jre-alpine
+# Etapa 2: Imagen final, solo con el JAR ya compilado
+FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=build /app/target/fleettrackpro-backend-1.0.0-SNAPSHOT-runner.jar ./app.jar
+COPY --from=build /app/target/quarkus-app/ ./
 EXPOSE 8080
-ENTRYPOINT ["java", "-Xmx400m", "-jar", "./app.jar"]
+ENTRYPOINT ["java", "-jar", "quarkus-run.jar"]
