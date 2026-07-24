@@ -1,13 +1,17 @@
-# Etapa 1: Compilar el proyecto con Maven
-FROM maven:3.9-eclipse-temurin-21 AS build
+# Fase 1: Compilación en la nube
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Etapa 2: Imagen final, solo con el JAR ya compilado
-FROM eclipse-temurin:21-jre
-WORKDIR /app
-COPY --from=build /app/target/quarkus-app/ ./
+# Fase 2: Imagen final ligera
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /deployments
+COPY --from=build /app/target/quarkus-app/lib/ /deployments/lib/
+COPY --from=build /app/target/quarkus-app/*.jar /deployments/
+COPY --from=build /app/target/quarkus-app/app/ /deployments/app/
+COPY --from=build /app/target/quarkus-app/quarkus/ /deployments/quarkus/
+ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Dquarkus.http.port=${PORT:-8080} -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "quarkus-run.jar"]
+CMD java $JAVA_OPTIONS -jar /deployments/quarkus-run.jar
